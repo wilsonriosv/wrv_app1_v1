@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Image, Button } from "react-native";
-import { auth } from "../firebaseConfig";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faUserCircle, faThermometerHalf } from "@fortawesome/free-solid-svg-icons";
+import { app } from "../firebaseConfig";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import axios from "axios";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCircle, faThermometerHalf } from "@fortawesome/free-solid-svg-icons";
+import { getAuth } from "firebase/auth";
 
 const db = getFirestore();
 
-export default function HomeScreen() {
+const auth = getAuth(app);
+
+export default function Home() {
     const [userCount, setUserCount] = useState(0);
     const [temperature, setTemperature] = useState(null);
     const [city, setCity] = useState(null);
@@ -18,7 +21,6 @@ export default function HomeScreen() {
         { title: "Card 3", description: "Yet another sample card.", image: "https://via.placeholder.com/150" },
     ]);
 
-    // Obtener la cantidad de usuarios registrados desde Firebase Firestore
     useEffect(() => {
         const getUserCount = async () => {
             const querySnapshot = await getDocs(collection(db, "users"));
@@ -27,12 +29,11 @@ export default function HomeScreen() {
         getUserCount();
     }, []);
 
-    // Obtener la temperatura y la ciudad desde la API de OpenWeatherMap
     useEffect(() => {
         const getWeather = async () => {
             try {
                 const response = await axios.get(
-                    `http://api.openweathermap.org/data/2.5/weather?q=Manizales&appid=YOUR_API_KEY&units=metric`
+                    `http://api.openweathermap.org/data/2.5/weather?q=Manizales&appid=247487e5a528ef75401a2aa4016916c8&units=metric`
                 );
                 setTemperature(response.data.main.temp);
                 setCity(response.data.name);
@@ -45,21 +46,19 @@ export default function HomeScreen() {
 
     return (
         <ScrollView style={styles.container}>
-            {/* Parte superior con estadísticas */}
             <View style={styles.statsContainer}>
                 <View style={styles.statCard}>
-                    <FontAwesomeIcon icon={faUserCircle} size={40} color="white" />
+                    <FontAwesomeIcon icon={faUserCircle} size={20} color="white" />
                     <Text style={styles.statText}>{userCount} Users</Text>
                 </View>
                 <View style={styles.statCard}>
-                    <FontAwesomeIcon icon={faThermometerHalf} size={40} color="white" />
+                    <FontAwesomeIcon icon={faThermometerHalf} size={20} color="white" />
                     <Text style={styles.statText}>
                         {temperature}°C - {city}
                     </Text>
                 </View>
             </View>
 
-            {/* Cards de ejemplo */}
             <View style={styles.cardsContainer}>
                 {cards.map((card, index) => (
                     <View key={index} style={styles.card}>
@@ -70,7 +69,6 @@ export default function HomeScreen() {
                 ))}
             </View>
 
-            {/* Botón de prueba (opcional) */}
             <Button title="Load More Cards" onPress={() => alert("More cards loaded!")} />
         </ScrollView>
     );
@@ -83,25 +81,28 @@ const styles = StyleSheet.create({
     },
     statsContainer: {
         flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 20,
+        justifyContent: "flex-end",
+        marginBottom: 20,        
     },
     statCard: {
         backgroundColor: "#4caf50",
         borderRadius: 50,
-        width: 120,
-        height: 120,
+        width: 90,
+        height: 90,
         justifyContent: "center",
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.8,
         shadowRadius: 3,
+        // los elementos de este container quedan muy pegados y quiero separarlos un poco
+        marginBottom: 10,
+        marginLeft: 10,
     },
     statText: {
         color: "white",
         marginTop: 5,
-        fontSize: 16,
+        fontSize: 12,
     },
     cardsContainer: {
         marginBottom: 20,
