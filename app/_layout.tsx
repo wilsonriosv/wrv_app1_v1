@@ -1,39 +1,47 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+/* import { Stack } from "expo-router";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  return <Stack />;
+} */
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
+  import { Slot } from "expo-router"; // Importar Slot para manejar las rutas
+  import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+  import Icon from "react-native-vector-icons/MaterialIcons";
+  
+  const Tab = createBottomTabNavigator();
+  
+  export default function Layout() {
+      return (
+          <Tab.Navigator
+              screenOptions={({ route }) => ({
+                  tabBarIcon: ({ color, size }) => {
+                      let iconName;
+                      switch (route.name) {
+                          case "home":
+                              iconName = "home";
+                              break;
+                          case "records":
+                              iconName = "list";
+                              break;
+                          case "weather":
+                              iconName = "cloud";
+                              break;
+                          case "settings":
+                              iconName = "settings";
+                              break;
+                          default:
+                              iconName = "home"; // Valor predeterminado si no se encuentra coincidencia
+                              break;
+                      }
+                      return <Icon name={iconName} size={size} color={color} />;
+                  },
+              })}
+          >
+              <Tab.Screen name="home" component={Slot} />
+              <Tab.Screen name="records" component={Slot} />
+              <Tab.Screen name="weather" component={Slot} />
+              <Tab.Screen name="settings" component={Slot} />
+          </Tab.Navigator>
+      );
   }
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
-}
+  
